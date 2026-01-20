@@ -1,44 +1,27 @@
 """
-Enhanced Social Media Privacy & Security Analytics Dashboard
-Fixed for Streamlit Cloud Deployment
-M.Tech Mini Project - Module 5: Visualization - Highcharts
+Social Media Privacy & Security Dashboard
+Clean version for Streamlit Cloud - No Plotly
+M.Tech Course Project - Module 5: Highcharts Visualization
 """
 
 import pandas as pd
 import numpy as np
 import json
 import streamlit as st
-from datetime import datetime, timedelta
+from datetime import datetime
 import streamlit.components.v1 as components
 import random
-import warnings
-warnings.filterwarnings('ignore')
 
-# Try to import plotly with graceful fallback
-try:
-    import plotly.graph_objects as go
-    import plotly.express as px
-    PLOTLY_AVAILABLE = True
-except ImportError:
-    PLOTLY_AVAILABLE = False
-    st.warning("Plotly not installed. Some visualizations will use alternative methods.")
-
-# Page configuration
+# Page configuration - MUST BE FIRST
 st.set_page_config(
-    page_title="Advanced Highcharts Visualization Dashboard",
+    page_title="Social Media Privacy Dashboard",
     page_icon="📊",
-    layout="wide",
-    initial_sidebar_state="expanded"
+    layout="wide"
 )
 
+# ========== HIGCHARTS GENERATOR ==========
 class HighchartsGenerator:
-    """Class to generate various Highcharts visualizations"""
-    
-    def __init__(self):
-        self.color_palette = [
-            '#2E93fA', '#66DA26', '#546E7A', '#E91E63', '#FF9800',
-            '#8B5CF6', '#00E396', '#FF4560', '#775DD0', '#3F51B5'
-        ]
+    """Generate Highcharts visualizations"""
     
     def create_network_graph(self, nodes_data, links_data):
         """Create social network graph"""
@@ -48,43 +31,25 @@ class HighchartsGenerator:
         <head>
             <script src="https://code.highcharts.com/highcharts.js"></script>
             <script src="https://code.highcharts.com/modules/networkgraph.js"></script>
-            <style>
-                #container {{
-                    min-width: 320px;
-                    max-width: 1200px;
-                    height: 600px;
-                    margin: 0 auto;
-                }}
-            </style>
         </head>
         <body>
-            <div id="container"></div>
-            <script type="text/javascript">
-                Highcharts.chart('container', {{
-                    chart: {{
+            <div id="network-container" style="width:100%; height:500px;"></div>
+            <script>
+                Highcharts.chart('network-container', {{
+                    chart: {{ 
                         type: 'networkgraph',
-                        height: 550,
                         backgroundColor: '#FFFFFF'
                     }},
-                    title: {{
-                        text: 'Social Network Analysis - Privacy Risk Propagation',
-                        align: 'left'
-                    }},
-                    subtitle: {{
-                        text: 'Visualizing user connections and community structures (Anonymized Ethical Data)',
+                    title: {{ 
+                        text: 'Social Network Analysis',
                         align: 'left'
                     }},
                     plotOptions: {{
                         networkgraph: {{
-                            keys: ['from', 'to'],
-                            layoutAlgorithm: {{
-                                enableSimulation: true,
-                                friction: -0.9
-                            }}
+                            keys: ['from', 'to']
                         }}
                     }},
                     series: [{{
-                        name: 'Social Network',
                         data: {json.dumps(links_data)},
                         nodes: {json.dumps(nodes_data)},
                         color: '#2E93fA',
@@ -92,66 +57,7 @@ class HighchartsGenerator:
                             enabled: true,
                             format: '{{point.name}}'
                         }}
-                    }}],
-                    tooltip: {{
-                        formatter: function() {{
-                            return '<b>Node:</b> ' + this.point.name + '<br>' +
-                                   '<b>Connections:</b> ' + this.point.links.length;
-                        }}
-                    }}
-                }});
-            </script>
-        </body>
-        </html>
-        '''
-        return html
-    
-    def create_sankey_diagram(self, nodes, links):
-        """Create Sankey diagram for data flow analysis"""
-        html = f'''
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <script src="https://code.highcharts.com/highcharts.js"></script>
-            <script src="https://code.highcharts.com/modules/sankey.js"></script>
-            <style>
-                #sankey-container {{
-                    min-width: 310px;
-                    max-width: 1200px;
-                    height: 600px;
-                    margin: 0 auto;
-                }}
-            </style>
-        </head>
-        <body>
-            <div id="sankey-container"></div>
-            <script type="text/javascript">
-                Highcharts.chart('sankey-container', {{
-                    chart: {{
-                        type: 'sankey',
-                        height: 550,
-                        backgroundColor: '#FFFFFF'
-                    }},
-                    title: {{
-                        text: 'Data Flow in Social Media Ecosystem',
-                        align: 'left'
-                    }},
-                    subtitle: {{
-                        text: 'How user data flows through social media platforms (Ethical Analysis)',
-                        align: 'left'
-                    }},
-                    series: [{{
-                        name: 'Data Flow',
-                        keys: ['from', 'to', 'weight'],
-                        data: {json.dumps(links)},
-                        nodes: {json.dumps(nodes)},
-                        nodeWidth: 20,
-                        nodePadding: 10
-                    }}],
-                    tooltip: {{
-                        headerFormat: null,
-                        pointFormat: '<b>{{point.fromNode.name}}</b> → <b>{{point.toNode.name}}</b><br/>'
-                    }}
+                    }}]
                 }});
             </script>
         </body>
@@ -160,46 +66,31 @@ class HighchartsGenerator:
         return html
     
     def create_heatmap_chart(self, categories_x, categories_y, data):
-        """Create heatmap for location privacy analysis"""
+        """Create heatmap for location privacy"""
         html = f'''
         <!DOCTYPE html>
         <html>
         <head>
             <script src="https://code.highcharts.com/highcharts.js"></script>
             <script src="https://code.highcharts.com/modules/heatmap.js"></script>
-            <style>
-                #heatmap-container {{
-                    min-width: 310px;
-                    max-width: 1200px;
-                    height: 500px;
-                    margin: 0 auto;
-                }}
-            </style>
         </head>
         <body>
-            <div id="heatmap-container"></div>
-            <script type="text/javascript">
+            <div id="heatmap-container" style="width:100%; height:450px;"></div>
+            <script>
                 Highcharts.chart('heatmap-container', {{
-                    chart: {{
+                    chart: {{ 
                         type: 'heatmap',
-                        height: 450,
                         backgroundColor: '#FFFFFF'
                     }},
-                    title: {{
+                    title: {{ 
                         text: 'Location Privacy Risk Heatmap',
                         align: 'left'
                     }},
-                    subtitle: {{
-                        text: 'Privacy risk scores across different locations and times',
-                        align: 'left'
-                    }},
                     xAxis: {{
-                        categories: {json.dumps(categories_x)},
-                        title: {{ text: 'Day of Week' }}
+                        categories: {json.dumps(categories_x)}
                     }},
                     yAxis: {{
                         categories: {json.dumps(categories_y)},
-                        title: {{ text: 'Hour of Day' }},
                         reversed: true
                     }},
                     colorAxis: {{
@@ -209,17 +100,13 @@ class HighchartsGenerator:
                     }},
                     series: [{{
                         name: 'Privacy Risk',
-                        borderWidth: 1,
-                        data: {json.dumps(data)},
-                        dataLabels: {{
-                            enabled: false
-                        }}
+                        data: {json.dumps(data)}
                     }}],
                     tooltip: {{
                         formatter: function() {{
-                            return '<b>Time:</b> ' + this.point.y + ':00<br>' +
-                                   '<b>Day:</b> ' + this.point.x + '<br>' +
-                                   '<b>Privacy Risk:</b> ' + this.point.value;
+                            return '<b>Day:</b> ' + this.point.x + '<br>' +
+                                   '<b>Time:</b> ' + this.point.y + '<br>' +
+                                   '<b>Risk:</b> ' + this.point.value + '/100';
                         }}
                     }}
                 }});
@@ -230,56 +117,37 @@ class HighchartsGenerator:
         return html
     
     def create_bubble_chart(self, data):
-        """Create bubble chart for social media metrics"""
+        """Create bubble chart for platform comparison"""
         html = f'''
         <!DOCTYPE html>
         <html>
         <head>
             <script src="https://code.highcharts.com/highcharts.js"></script>
-            <style>
-                #bubble-container {{
-                    min-width: 310px;
-                    max-width: 1200px;
-                    height: 500px;
-                    margin: 0 auto;
-                }}
-            </style>
         </head>
         <body>
-            <div id="bubble-container"></div>
-            <script type="text/javascript">
+            <div id="bubble-container" style="width:100%; height:450px;"></div>
+            <script>
                 Highcharts.chart('bubble-container', {{
-                    chart: {{
+                    chart: {{ 
                         type: 'bubble',
-                        zoomType: 'xy',
-                        height: 450,
                         backgroundColor: '#FFFFFF'
                     }},
-                    title: {{
+                    title: {{ 
                         text: 'Social Media Platform Comparison',
                         align: 'left'
                     }},
-                    subtitle: {{
-                        text: 'Bubble size represents data collection volume',
-                        align: 'left'
-                    }},
                     xAxis: {{
-                        title: {{
-                            text: 'Monthly Active Users (Millions)'
-                        }}
+                        title: {{ text: 'Monthly Active Users (Millions)' }}
                     }},
                     yAxis: {{
-                        title: {{
-                            text: 'Privacy Protection Score (0-100)'
-                        }}
+                        title: {{ text: 'Privacy Score (0-100)' }}
                     }},
                     series: [{{
                         name: 'Platforms',
                         data: {json.dumps(data)}
                     }}],
                     tooltip: {{
-                        headerFormat: '<b>{{point.name}}</b><br>',
-                        pointFormat: 'Users: {{point.x}}M<br>Privacy Score: {{point.y}}<br>Data: {{point.z}}TB/month'
+                        pointFormat: '<b>{{point.name}}</b><br>Users: {{point.x}}M<br>Privacy: {{point.y}}<br>Data: {{point.z}}TB/month'
                     }}
                 }});
             </script>
@@ -289,36 +157,23 @@ class HighchartsGenerator:
         return html
     
     def create_timeline_chart(self, series_data):
-        """Create timeline chart for security incidents"""
+        """Create timeline for security incidents"""
         html = f'''
         <!DOCTYPE html>
         <html>
         <head>
             <script src="https://code.highcharts.com/highcharts.js"></script>
-            <style>
-                #timeline-container {{
-                    min-width: 310px;
-                    max-width: 1200px;
-                    height: 500px;
-                    margin: 0 auto;
-                }}
-            </style>
         </head>
         <body>
-            <div id="timeline-container"></div>
-            <script type="text/javascript">
+            <div id="timeline-container" style="width:100%; height:450px;"></div>
+            <script>
                 Highcharts.chart('timeline-container', {{
-                    chart: {{
+                    chart: {{ 
                         type: 'line',
-                        height: 450,
                         backgroundColor: '#FFFFFF'
                     }},
-                    title: {{
-                        text: 'Security Incidents Timeline - Last 12 Months',
-                        align: 'left'
-                    }},
-                    subtitle: {{
-                        text: 'Tracking phishing, data breaches, and malware incidents',
+                    title: {{ 
+                        text: 'Security Incidents Timeline',
                         align: 'left'
                     }},
                     xAxis: {{
@@ -326,81 +181,9 @@ class HighchartsGenerator:
                                     'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
                     }},
                     yAxis: {{
-                        title: {{
-                            text: 'Number of Incidents'
-                        }}
+                        title: {{ text: 'Number of Incidents' }}
                     }},
-                    series: {json.dumps(series_data)},
-                    tooltip: {{
-                        shared: true
-                    }}
-                }});
-            </script>
-        </body>
-        </html>
-        '''
-        return html
-    
-    def create_gauge_chart(self, value, max_value=100):
-        """Create gauge chart for privacy risk score"""
-        html = f'''
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <script src="https://code.highcharts.com/highcharts.js"></script>
-            <script src="https://code.highcharts.com/highcharts-more.js"></script>
-            <script src="https://code.highcharts.com/modules/solid-gauge.js"></script>
-            <style>
-                #gauge-container {{
-                    min-width: 310px;
-                    max-width: 600px;
-                    height: 400px;
-                    margin: 0 auto;
-                }}
-            </style>
-        </head>
-        <body>
-            <div id="gauge-container"></div>
-            <script type="text/javascript">
-                Highcharts.chart('gauge-container', {{
-                    chart: {{
-                        type: 'solidgauge',
-                        height: 350,
-                        backgroundColor: '#FFFFFF'
-                    }},
-                    title: {{
-                        text: 'Overall Privacy Risk Score'
-                    }},
-                    pane: {{
-                        center: ['50%', '85%'],
-                        size: '140%',
-                        startAngle: -90,
-                        endAngle: 90,
-                        background: {{
-                            backgroundColor: '#FFF',
-                            innerRadius: '60%',
-                            outerRadius: '100%',
-                            shape: 'arc'
-                        }}
-                    }},
-                    yAxis: {{
-                        min: 0,
-                        max: {max_value},
-                        stops: [
-                            [0.1, '#55BF3B'],
-                            [0.5, '#DDDF0D'],
-                            [0.9, '#DF5353']
-                        ]
-                    }},
-                    series: [{{
-                        name: 'Risk Score',
-                        data: [{value}],
-                        dataLabels: {{
-                            format: '<div style="text-align:center">' +
-                                   '<span style="font-size:25px">{{y}}</span><br/>' +
-                                   '<span style="font-size:12px">OUT OF {max_value}</span></div>'
-                        }}
-                    }}]
+                    series: {json.dumps(series_data)}
                 }});
             </script>
         </body>
@@ -408,50 +191,27 @@ class HighchartsGenerator:
         '''
         return html
 
+# ========== DATA SIMULATOR ==========
 class DataSimulator:
-    """Simulate data for ethical visualization"""
+    """Generate simulated data for visualization"""
     
     @staticmethod
     def generate_network_data():
-        """Generate social network data"""
+        """Generate network data"""
         nodes = []
-        for i in range(15):
+        for i in range(12):
             nodes.append({
                 'id': f'user_{i}',
                 'name': f'User_{1000 + i}',
-                'value': random.uniform(0.5, 5.0),
-                'community': random.choice(['A', 'B', 'C']),
-                'color': random.choice(['#2E93fA', '#66DA26', '#E91E63'])
+                'value': random.uniform(0.5, 5.0)
             })
         
         links = []
-        for i in range(25):
-            source = f'user_{random.randint(0, 14)}'
-            target = f'user_{random.randint(0, 14)}'
+        for _ in range(20):
+            source = f'user_{random.randint(0, 11)}'
+            target = f'user_{random.randint(0, 11)}'
             if source != target:
                 links.append([source, target])
-        
-        return nodes, links
-    
-    @staticmethod
-    def generate_sankey_data():
-        """Generate data for Sankey diagram"""
-        nodes = [
-            {'id': 'User', 'name': 'User Profile'},
-            {'id': 'Posts', 'name': 'User Posts'},
-            {'id': 'Location', 'name': 'Location Data'},
-            {'id': 'Platform', 'name': 'Social Platform'},
-            {'id': 'Advertisers', 'name': 'Advertisers'},
-            {'id': 'Analytics', 'name': 'Analytics Firms'}
-        ]
-        
-        links = [
-            ['User', 'Platform', 25],
-            ['Posts', 'Platform', 40],
-            ['Location', 'Platform', 15],
-            ['Platform', 'Advertisers', 50],
-            ['Platform', 'Analytics', 30]
-        ]
         
         return nodes, links
     
@@ -459,18 +219,21 @@ class DataSimulator:
     def generate_heatmap_data():
         """Generate heatmap data"""
         days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-        hours = [f'{h}:00' for h in range(8, 22, 2)]
+        hours = ['8:00', '10:00', '12:00', '14:00', '16:00', '18:00', '20:00']
         
         data = []
         for i, day in enumerate(days):
             for j, hour in enumerate(hours):
-                base_risk = 30
+                # Base risk
+                risk = 40
+                # Higher on weekends
                 if day in ['Sat', 'Sun']:
-                    base_risk += 20
-                if 18 <= int(hour.split(':')[0]) <= 22:
-                    base_risk += 25
-                
-                risk = base_risk + random.randint(-10, 10)
+                    risk += 20
+                # Higher in evening
+                if '18:00' in hour or '20:00' in hour:
+                    risk += 15
+                # Add some randomness
+                risk += random.randint(-10, 10)
                 risk = max(0, min(100, risk))
                 
                 data.append([i, j, risk])
@@ -489,12 +252,12 @@ class DataSimulator:
         ]
         
         data = []
-        for platform in platforms:
+        for p in platforms:
             data.append({
-                'x': platform['users'],
-                'y': platform['privacy'],
-                'z': platform['data'],
-                'name': platform['name']
+                'x': p['users'],
+                'y': p['privacy'],
+                'z': p['data'],
+                'name': p['name']
             })
         
         return data
@@ -502,7 +265,7 @@ class DataSimulator:
     @staticmethod
     def generate_timeline_data():
         """Generate timeline data"""
-        series_data = [
+        return [
             {
                 'name': 'Phishing Attacks',
                 'data': [45, 52, 38, 60, 55, 48, 65, 70, 58, 62, 75, 80],
@@ -514,232 +277,172 @@ class DataSimulator:
                 'color': '#8B5CF6'
             }
         ]
-        
-        return series_data
 
-class EnhancedPrivacyDashboard:
-    """Main dashboard class"""
+# ========== MAIN DASHBOARD ==========
+def main():
+    """Main dashboard function"""
     
-    def __init__(self):
-        self.hc_generator = HighchartsGenerator()
-        self.data_simulator = DataSimulator()
+    # Initialize generators
+    hc = HighchartsGenerator()
+    data_sim = DataSimulator()
     
-    def render_header(self):
-        """Render dashboard header"""
-        st.title("📊 Social Media Privacy & Security Dashboard")
-        st.markdown("**M.Tech Mini Project | Ethical Issues in IT | Module 5: Highcharts Visualization**")
+    # Header
+    st.title("📊 Social Media Privacy & Security Dashboard")
+    st.markdown("**M.Tech Course Project | Ethical Issues in IT | Module 5: Highcharts Visualization**")
+    
+    # Course info
+    with st.expander("📚 Course Connection", expanded=False):
+        st.write("""
+        **Modules Covered:**
+        - Module 3: Privacy & Security in OSNs
+        - Module 4: Phishing & Network Analysis  
+        - Module 5: Case Studies & Highcharts
         
-        with st.expander("Course Connection", expanded=False):
-            st.write("""
-            **Modules Covered:**
-            - Module 3: Privacy & Security in OSNs
-            - Module 4: Phishing & Network Visualization  
-            - Module 5: Case Studies & Highcharts
-            
-            **Course Outcomes:**
-            - CO3: Analyze ethical dilemmas
-            - CO4: Real-world case studies
-            """)
+        **Course Outcomes:**
+        - CO3: Analyze ethical dilemmas
+        - CO4: Analyze real-world case studies
+        """)
     
-    def render_sidebar(self):
-        """Render sidebar"""
-        with st.sidebar:
-            st.title("Controls")
-            
-            selected_charts = st.multiselect(
-                "Chart Types:",
-                ["Network Graph", "Sankey Diagram", "Heatmap", "Bubble Chart", "Timeline", "Gauge"],
-                default=["Network Graph", "Sankey Diagram", "Heatmap"]
-            )
-            
-            st.divider()
-            st.caption(f"Last update: {datetime.now().strftime('%H:%M:%S')}")
-            
-            return selected_charts
+    # Sidebar
+    with st.sidebar:
+        st.title("Controls")
+        chart_type = st.selectbox(
+            "Select Chart:",
+            ["Network Graph", "Heatmap", "Bubble Chart", "Timeline", "All"]
+        )
+        st.divider()
+        st.caption(f"Updated: {datetime.now().strftime('%H:%M:%S')}")
     
-    def render_network_section(self):
-        """Render network graph"""
+    # NETWORK GRAPH
+    if chart_type in ["Network Graph", "All"]:
         st.subheader("🔗 Social Network Analysis")
         
         col1, col2 = st.columns([3, 1])
-        
         with col1:
-            nodes, links = self.data_simulator.generate_network_data()
-            html = self.hc_generator.create_network_graph(nodes, links)
-            components.html(html, height=600)
+            nodes, links = data_sim.generate_network_data()
+            html = hc.create_network_graph(nodes, links)
+            components.html(html, height=550)
         
         with col2:
-            st.metric("Nodes", len(nodes))
+            st.metric("Total Nodes", len(nodes))
             st.metric("Connections", len(links))
-            
             st.info("""
             **Ethical Note:**
-            - All data anonymized
-            - Simulated network
-            - No real users
+            - Simulated data only
+            - No real user information
             """)
     
-    def render_sankey_section(self):
-        """Render Sankey diagram"""
-        st.subheader("🌊 Data Flow Analysis")
-        
-        nodes, links = self.data_simulator.generate_sankey_data()
-        
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            total_data = sum([link[2] for link in links])
-            st.metric("Data Flow", f"{total_data} GB/month")
-        with col2:
-            st.metric("Entities", len(nodes))
-        with col3:
-            st.metric("Pathways", len(links))
-        
-        html = self.hc_generator.create_sankey_diagram(nodes, links)
-        components.html(html, height=600)
-    
-    def render_heatmap_section(self):
-        """Render heatmap"""
+    # HEATMAP
+    if chart_type in ["Heatmap", "All"]:
         st.subheader("📍 Location Privacy Heatmap")
         
-        days, hours, data = self.data_simulator.generate_heatmap_data()
+        days, hours, heat_data = data_sim.generate_heatmap_data()
         
-        risks = [point[2] for point in data]
+        # Calculate stats
+        risks = [d[2] for d in heat_data]
         col1, col2, col3 = st.columns(3)
         with col1:
-            st.metric("Avg Risk", f"{np.mean(risks):.1f}/100")
+            st.metric("Average Risk", f"{np.mean(risks):.1f}/100")
         with col2:
-            st.metric("Peak Risk", max(risks))
+            st.metric("Peak Risk", f"{max(risks)}/100")
         with col3:
-            high_risk = len([r for r in risks if r > 70])
-            st.metric("High Risk", high_risk)
+            high = len([r for r in risks if r > 70])
+            st.metric("High Risk Slots", high)
         
-        html = self.hc_generator.create_heatmap_chart(days, hours, data)
+        # Display heatmap
+        html = hc.create_heatmap_chart(days, hours, heat_data)
         components.html(html, height=500)
     
-    def render_bubble_section(self):
-        """Render bubble chart"""
+    # BUBBLE CHART
+    if chart_type in ["Bubble Chart", "All"]:
         st.subheader("🫧 Platform Comparison")
         
-        data = self.data_simulator.generate_bubble_data()
+        bubble_data = data_sim.generate_bubble_data()
         
-        # Create summary table
-        df = pd.DataFrame([
-            {'Platform': d['name'], 'Users': d['x'], 'Privacy': d['y'], 'Data': d['z']}
-            for d in data
-        ])
+        # Find best privacy and most users
+        platforms = [
+            {'name': 'Facebook', 'users': 2910, 'privacy': 45},
+            {'name': 'Instagram', 'users': 2000, 'privacy': 50},
+            {'name': 'Twitter', 'users': 450, 'privacy': 60},
+            {'name': 'LinkedIn', 'users': 930, 'privacy': 70},
+            {'name': 'TikTok', 'users': 1500, 'privacy': 40}
+        ]
         
-        best_privacy = df.loc[df['Privacy'].idxmax()]
-        most_users = df.loc[df['Users'].idxmax()]
+        # Convert to DataFrame for easy analysis
+        df = pd.DataFrame(platforms)
+        best_privacy = df.loc[df['privacy'].idxmax()]
+        most_users = df.loc[df['users'].idxmax()]
         
+        # Display metrics
         col1, col2 = st.columns(2)
         with col1:
-            st.metric("Best Privacy", best_privacy['Platform'], f"{best_privacy['Privacy']}/100")
+            st.metric(
+                "Best Privacy", 
+                best_privacy['name'], 
+                f"{best_privacy['privacy']}/100"
+            )
         with col2:
-            st.metric("Most Users", most_users['Platform'], f"{most_users['Users']}M")
+            st.metric(
+                "Most Users", 
+                most_users['name'], 
+                f"{most_users['users']}M"
+            )
         
-        html = self.hc_generator.create_bubble_chart(data)
+        # Display bubble chart
+        html = hc.create_bubble_chart(bubble_data)
         components.html(html, height=500)
         
-        with st.expander("Data Table"):
+        # Show data table
+        with st.expander("📊 View Platform Data"):
             st.dataframe(df)
     
-    def render_timeline_section(self):
-        """Render timeline"""
-        st.subheader("📅 Security Incidents")
+    # TIMELINE
+    if chart_type in ["Timeline", "All"]:
+        st.subheader("📅 Security Incidents Timeline")
         
-        data = self.data_simulator.generate_timeline_data()
+        timeline_data = data_sim.generate_timeline_data()
         
-        totals = {s['name']: sum(s['data']) for s in data}
+        # Calculate totals
+        phishing_total = sum(timeline_data[0]['data'])
+        breaches_total = sum(timeline_data[1]['data'])
+        
         col1, col2 = st.columns(2)
         with col1:
-            st.metric("Phishing", totals['Phishing Attacks'])
+            st.metric("Total Phishing", phishing_total)
         with col2:
-            st.metric("Data Breaches", totals['Data Breaches'])
+            st.metric("Total Data Breaches", breaches_total)
         
-        html = self.hc_generator.create_timeline_chart(data)
+        # Display timeline
+        html = hc.create_timeline_chart(timeline_data)
         components.html(html, height=500)
     
-    def render_gauge_section(self):
-        """Render gauge"""
-        st.subheader("⚠️ Risk Assessment")
-        
-        risk_score = random.randint(35, 75)
-        
-        col1, col2 = st.columns([2, 1])
-        with col1:
-            html = self.hc_generator.create_gauge_chart(risk_score)
-            components.html(html, height=400)
-        with col2:
-            st.metric("Risk Score", f"{risk_score}/100")
-            
-            st.write("**Factors:**")
-            factors = {
-                "Location": random.randint(40, 90),
-                "Data Sharing": random.randint(30, 80),
-                "Network": random.randint(20, 70)
-            }
-            
-            for factor, score in factors.items():
-                st.progress(score/100, text=f"{factor}: {score}")
+    # Course outcomes summary
+    st.divider()
+    st.subheader("🎓 Course Outcomes Demonstrated")
     
-    def render_conclusion(self):
-        """Render conclusion"""
-        st.divider()
-        
-        col1, col2 = st.columns([2, 1])
-        with col1:
-            st.markdown("""
-            ### Project Summary
-            
-            **Highcharts Visualizations Implemented:**
-            1. Network Graph - Social connections
-            2. Sankey Diagram - Data flow  
-            3. Heatmap - Location patterns
-            4. Bubble Chart - Platform comparison
-            5. Timeline - Security incidents
-            6. Gauge Chart - Risk assessment
-            
-            **Course Alignment:**
-            - Module 3: OSN Privacy & Security
-            - Module 4: Phishing & Network Analysis
-            - Module 5: Case Studies & Visualization
-            """)
-        
-        with col2:
-            st.write("### Status")
-            st.success("✅ Streamlit Cloud Ready")
-            st.info("✅ Ethical Data Handling")
-            st.warning("✅ Course Requirements Met")
-        
-        st.info("**Academic Submission Ready** - This project demonstrates practical Highcharts implementation for M.Tech course requirements.")
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.markdown("**CO1 & CO2**")
+        st.write("Identify ethical issues & apply concepts")
+    with col2:
+        st.markdown("**CO3**")
+        st.write("Analyze ethical dilemmas")
+    with col3:
+        st.markdown("**CO4**")
+        st.write("Real-world case study analysis")
     
-    def run(self):
-        """Main run method"""
-        self.render_header()
-        selected = self.render_sidebar()
-        
-        # Only show selected charts
-        if "Network Graph" in selected:
-            self.render_network_section()
-        
-        if "Sankey Diagram" in selected:
-            self.render_sankey_section()
-        
-        if "Heatmap" in selected:
-            self.render_heatmap_section()
-        
-        if "Bubble Chart" in selected:
-            self.render_bubble_section()
-        
-        if "Timeline" in selected:
-            self.render_timeline_section()
-        
-        if "Gauge" in selected:
-            self.render_gauge_section()
-        
-        self.render_conclusion()
+    # Ethical considerations
+    with st.expander("⚖️ Ethical Implementation"):
+        st.write("""
+        1. **Data Privacy**: All data is simulated
+        2. **No Real Users**: No personal information used
+        3. **Educational Purpose**: Academic project only
+        4. **Transparency**: Clear about data sources
+        """)
+    
+    # Footer
+    st.caption("M.Tech in Information Technology | Ethical Issues Course | 2024")
 
 # Run the app
 if __name__ == "__main__":
-    app = EnhancedPrivacyDashboard()
-    app.run()
+    main()
